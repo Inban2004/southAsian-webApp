@@ -1,0 +1,18 @@
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# Backend
+backend/venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/.env
+backend/*.egg-info/
+
+# OS / editor
+.DS_Store
+*.log
+.claude/settings.local.json
+.claude/
