@@ -2,6 +2,40 @@
 
 Picks up where this session left off. Ordered by priority.
 
+## 0. Deployment — ✅ LIVE
+
+Two separate Vercel projects, both linked to `github.com/Inban2004/southAsian-webApp`:
+
+- **Backend**: `https://south-asian-web-app.vercel.app` (root directory: `backend`)
+- **Frontend**: `https://south-asian-web-app-3cof.vercel.app` (root directory: `frontend`)
+
+Both verified live end-to-end: `/health` and `/api/categories`/`/api/products/*` return real
+MongoDB data, and the frontend's production JS bundle has the real backend URL and Supabase
+credentials baked in (not `localhost`). CORS is scoped to the real frontend origin, not `*`.
+
+**Gotchas hit while deploying, worth remembering:**
+- Each Vercel project's "Root Directory" setting is applied *relative to wherever you run
+  `vercel deploy` from* — you must deploy from the **repo root**, not from inside `backend/` or
+  `frontend/` themselves, or it errors "Root Directory does not exist."
+- The CLI can only have one project linked per directory (`.vercel/project.json`) at a time. Since
+  both projects need root-level deploys, you have to `rm -rf .vercel && vercel link --project <name>`
+  to switch which project the repo root points to before each deploy. Easy to deploy to the wrong
+  project by forgetting which one is currently linked — always double check with
+  `cat .vercel/project.json` before deploying.
+- Vite env vars (`VITE_*`) are baked in **at build time**, not read at runtime. Setting them in
+  Vercel *after* a build already happened does nothing until you redeploy.
+- New Vercel projects start with **zero env vars** even if you typed them into the dashboard's
+  "Import Project" form — verify with `vercel env ls` after import, don't assume.
+- `git push`/`vercel deploy` of anything with real photo assets (~27MB) is genuinely slow (~60-100
+  KiB/s observed) under this environment's network — looks like a hang if you time out too early.
+  Give it minutes, not seconds, before assuming it's broken.
+
+- [ ] **Not done**: Supabase's **Site URL / Redirect URLs** (Auth settings in the Supabase
+      dashboard) still need updating from `localhost` to `https://south-asian-web-app-3cof.vercel.app`
+      — otherwise the signup confirmation email link won't work correctly in production. No CLI for
+      this, has to be done in the dashboard.
+- [ ] Not done: a custom domain (both projects are on default `*.vercel.app` URLs for now)
+
 ## 1. MongoDB — ✅ DONE
 
 - [x] Real `MONGODB_URI` in `backend/.env` (Atlas, free M0 cluster)
